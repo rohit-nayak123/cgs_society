@@ -24,7 +24,6 @@ mail_password: str = os.environ.get("MAIL_PASSWORD", "")
 
 tables_db = TablesDB(client)
 
-
 def loadRow(day, time):
     result: RowList = tables_db.list_rows(
         database_id=database_id,
@@ -37,14 +36,14 @@ def loadRow(day, time):
     )
     return result.model_dump()
 
-
 def sendMail():
 
     timezone = zoneinfo.ZoneInfo("Asia/Kolkata")
     present_time = datetime.now(timezone)
     day = present_time.strftime("%A")
     day = day[0:3]
-    hour = present_time.hour
+    hour = int(present_time.strftime("%I"))
+    am_pm = present_time.strftime("%p")
 
     data = loadRow(day, hour)
     # data = loadRow("Fri", 9)
@@ -64,9 +63,9 @@ def sendMail():
                 msg = EmailMessage()
                 msg['From'] = mail_id
                 msg['To'] = email
-                msg['Subject'] = "Your have class"
+                msg['Subject'] = "Your have a class"
                 msg.set_content("Hello,\n\nYou have class of " + str(subject) + " at class room " +
-                                str(location) + " for " + str(duration) + " hours at " + str(stime) + " O' clock")
+                                str(location) + " for " + str(duration) + " hours at " + str(stime) + " " + str(am_pm) + " O' clock")
                 smtp.login(mail_id, mail_password)
                 smtp.send_message(msg)
             print("Email sent successfully!")
@@ -76,11 +75,9 @@ def sendMail():
 
 # '''
 
-
 # sendMail()
 
 # '''
-
 
 def cron_jobs(scheduler: AsyncIOScheduler):
     """
@@ -98,4 +95,5 @@ def cron_jobs(scheduler: AsyncIOScheduler):
     )
 
     print("Daytime hourly job registered successfully.")
+    
 # '''
