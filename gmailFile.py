@@ -43,7 +43,7 @@ def sendMail():
     timezone = zoneinfo.ZoneInfo("Asia/Kolkata")
     present_time = datetime.now(timezone)
     day = present_time.strftime("%A")
-    day = day[0:2]
+    day = day[0:3]
     hour = present_time.hour
 
     data = loadRow(day, hour)
