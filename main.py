@@ -40,7 +40,7 @@ while True:
         if len(timetable) == 0:
             print("Enter your Class.")
         else:
-            reqUrl = "http://127.0.0.1:8000/timetable"
+            reqUrl = "https://cgs-society.onrender.com/timetable"
             headers = {
                 "Accept": "*/*",
                 "Content-Type": "application/json"

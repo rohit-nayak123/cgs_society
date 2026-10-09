@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CGS IIT Kgp</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        /* Beautiful gradient background */
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      .form-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
+      }
+      h1 {
+        text-align: center;
+        color: #1e3c72;
+        margin-bottom: 30px;
+        font-size: 28px;
+        letter-spacing: 1px;
+      }
+      .input-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      input[type="email"],
+      input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+      }
+      input[type="email"]:focus {
+        outline: none;
+        border-color: #2a5298;
+      }
+      button {
+        width: 100%;
+        padding: 14px;
+        background-color: #2a5298;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #1e3c72;
+      }
+      #statusMessage {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .success {
+        color: #28a745;
+      }
+      .error {
+        color: #dc3545;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h1>CGS IIT Kgp</h1>
+      <form id="submissionForm">
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="student@kgpian.iitkgp.ac.in"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="imageUpload">Upload Image (.jpg, .jpeg, .png)</label>
+          <input
+            type="file"
+            id="imageUpload"
+            accept=".jpg, .jpeg, .png"
+            required
+          />
+        </div>
+
+        <button type="submit" id="submitBtn">Submit</button>
+        <div id="statusMessage"></div>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("submissionForm");
+      const statusMessage = document.getElementById("statusMessage");
+      const submitBtn = document.getElementById("submitBtn");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        statusMessage.textContent = "";
+
+        const emailInput = document.getElementById("email").value;
+        const imageInput = document.getElementById("imageUpload");
+        const file = imageInput.files[0];
+
+        // 1. Verify Email Format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailInput)) {
+          showStatus("Please enter a valid email address.", false);
+          return;
+        }
+
+        // 2. Verify Image Extension
+        if (file) {
+          const allowedExtensions = ["jpg", "jpeg", "png"];
+          const fileExtension = file.name.split(".").pop().toLowerCase();
+
+          if (!allowedExtensions.includes(fileExtension)) {
+            showStatus(
+              "Invalid file type. Only JPG, JPEG, and PNG are allowed.",
+              false,
+            );
+            return;
+          }
+        } else {
+          showStatus("Please select an image.", false);
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        // 3. Convert Image to Base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Image = reader.result;
+
+          try {
+            console.log(
+              JSON.stringify({
+                email: emailInput,
+                image: base64Image,
+                filename: file.name,
+              }),
+            );
+            // const response = await fetch("/api/submit", {
+            const response = await fetch("http://localhost:8000/timetable", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: emailInput,
+                image: base64Image,
+                filename: file.name,
+              }),
+            });
+            console.log(await response.text());
+
+            if (response.ok) {
+              showStatus("Form submitted successfully!", true);
+              form.reset();
+            } else {
+              showStatus("Something went wrong. Please try again.", false);
+            }
+          } catch (error) {
+            showStatus("Network error. Could not submit.", false);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit";
+          }
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      function showStatus(message, isSuccess) {
+        statusMessage.textContent = message;
+        statusMessage.className = isSuccess ? "success" : "error";
+      }
+    </script>
+  </body>
+</html>

@@ -21,7 +21,6 @@ database_id: str = os.environ.get("DATABASE_ID", "")
 table_id: str = os.environ.get("TABLE_ID", "")
 mail_id: str = os.environ.get("MAIL", "")
 mail_password: str = os.environ.get("MAIL_PASSWORD", "")
-sender_email: str = os.environ.get("SENDER_EMAIL")
 
 tables_db = TablesDB(client)
 
@@ -61,7 +60,7 @@ def sendMail():
         with smtplib.SMTP('smtp-relay.brevo.com', 2525) as smtp:
             smtp.starttls()
             smtp.login(mail_id, mail_password)
-
+            sender_email = os.environ.get("SENDER_EMAIL")
             for i in rows:
                 email = i["data"]["email"]
                 print(email)
@@ -87,6 +86,7 @@ def sendMail():
 # sendMail()
 
 # '''
+
 
 def cron_jobs(scheduler: AsyncIOScheduler):
     """
