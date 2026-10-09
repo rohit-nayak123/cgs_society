@@ -24,6 +24,7 @@ mail_password: str = os.environ.get("MAIL_PASSWORD", "")
 
 tables_db = TablesDB(client)
 
+
 def loadRow(day, time):
     result: RowList = tables_db.list_rows(
         database_id=database_id,
@@ -36,6 +37,7 @@ def loadRow(day, time):
     )
     return result.model_dump()
 
+
 def sendMail():
 
     timezone = zoneinfo.ZoneInfo("Asia/Kolkata")
@@ -44,6 +46,8 @@ def sendMail():
     day = day[0:3]
     hour = int(present_time.strftime("%I"))
     am_pm = present_time.strftime("%p")
+    print(day)
+    print(hour)
 
     data = loadRow(day, hour)
     # data = loadRow("Fri", 9)
@@ -56,6 +60,7 @@ def sendMail():
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             for i in rows:
                 email = i["data"]["email"]
+                print(email)
                 location = i["data"]["location"]
                 duration = i["data"]["duration"]
                 subject = "" + i["data"]["subject"]
@@ -79,6 +84,7 @@ def sendMail():
 
 # '''
 
+
 def cron_jobs(scheduler: AsyncIOScheduler):
     """
     Runs at 45 minutes past the hour, from 07:45 to 16:45 from Mon to Fri
@@ -95,5 +101,4 @@ def cron_jobs(scheduler: AsyncIOScheduler):
     )
 
     print("Daytime hourly job registered successfully.")
-    
 # '''
