@@ -50,7 +50,7 @@ def sendMail():
     print(day)
     print(hour)
 
-    data = loadRow(day, hour)
+    data = loadRow(day, hour + 1)
     # data = loadRow("Fri", 9)
     rows = data["rows"]
     # print(rows)
