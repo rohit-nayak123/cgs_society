@@ -96,7 +96,6 @@ def cron_jobs(scheduler: AsyncIOScheduler):
         day_of_week='mon-fri',
         hour='7-16',
         minute=43,
-        misfire_grace_time=300,
         max_instances=1
     )
 
