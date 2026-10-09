@@ -46,8 +46,6 @@ def sendMail():
     day = day[0:3]
     hour = int(present_time.strftime("%I"))
     am_pm = present_time.strftime("%p")
-    print(day)
-    print(hour)
 
     data = loadRow(day, hour)
     # data = loadRow("Fri", 9)
@@ -57,7 +55,10 @@ def sendMail():
     #     print(i)
     # '''
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        with smtplib.SMTP_SSL('smtp-relay.brevo.com', 2525) as smtp:
+            smtp.starttls()
+            smtp.login(mail_id, mail_password)
+            sender_email = os.environ.get("SENDER_EMAIL")
             for i in rows:
                 email = i["data"]["email"]
                 print(email)
@@ -66,7 +67,7 @@ def sendMail():
                 subject = "" + i["data"]["subject"]
                 stime = i["data"]["Stime"]
                 msg = EmailMessage()
-                msg['From'] = mail_id
+                msg['From'] = sender_email
                 msg['To'] = email
                 msg['Subject'] = "Your have a class"
                 msg.set_content("Hello,\n\nYou have class of " + str(subject) + " at class room " +
@@ -83,7 +84,6 @@ def sendMail():
 # sendMail()
 
 # '''
-
 
 def cron_jobs(scheduler: AsyncIOScheduler):
     """
