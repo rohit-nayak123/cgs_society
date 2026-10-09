@@ -21,6 +21,7 @@ database_id: str = os.environ.get("DATABASE_ID", "")
 table_id: str = os.environ.get("TABLE_ID", "")
 mail_id: str = os.environ.get("MAIL", "")
 mail_password: str = os.environ.get("MAIL_PASSWORD", "")
+sender_email: str = os.environ.get("SENDER_EMAIL")
 
 tables_db = TablesDB(client)
 
@@ -46,6 +47,8 @@ def sendMail():
     day = day[0:3]
     hour = int(present_time.strftime("%I"))
     am_pm = present_time.strftime("%p")
+    print(day)
+    print(hour)
 
     data = loadRow(day, hour)
     # data = loadRow("Fri", 9)
@@ -55,10 +58,10 @@ def sendMail():
     #     print(i)
     # '''
     try:
-        with smtplib.SMTP_SSL('smtp-relay.brevo.com', 2525) as smtp:
+        with smtplib.SMTP('smtp-relay.brevo.com', 2525) as smtp:
             smtp.starttls()
             smtp.login(mail_id, mail_password)
-            sender_email = os.environ.get("SENDER_EMAIL")
+
             for i in rows:
                 email = i["data"]["email"]
                 print(email)
@@ -72,7 +75,7 @@ def sendMail():
                 msg['Subject'] = "Your have a class"
                 msg.set_content("Hello,\n\nYou have class of " + str(subject) + " at class room " +
                                 str(location) + " for " + str(duration) + " hours at " + str(stime) + " " + str(am_pm) + " O' clock")
-                smtp.login(mail_id, mail_password)
+
                 smtp.send_message(msg)
             print("Email sent successfully!")
 
